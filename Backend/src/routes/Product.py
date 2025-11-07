@@ -1,0 +1,289 @@
+from flask import Blueprint, request, jsonify
+#models
+from models.Productomodel import ProductoModel
+
+#entities
+from models.entities.Producto import Producto
+
+
+main = Blueprint('product_blueprint', __name__)
+
+@main.route('/', methods=['GET'])
+def get_products():
+    """
+    Obtener todos los productos registrados en la base de datos.
+    ---
+    tags:
+      - Productos
+    responses:
+      200:
+        description: Lista de productos obtenida correctamente
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+                    example: 1
+                  nombre:
+                    type: string
+                    example: "Shampoo Herbal"
+                  marca:
+                    type: string
+                    example: "Herbal Essences"
+                  cantidad:
+                    type: integer
+                    example: 20
+                  precio:
+                    type: number
+                    format: float
+                    example: 15900
+      500:
+        description: Error interno del servidor
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: "Error al obtener productos"
+    """
+
+    try:
+        productos = ProductoModel.get_productos()
+        return jsonify(productos), 200
+    except Exception as ex:
+        return jsonify({'message': str(ex)}), 500
+
+@main.route('/<id>', methods=['GET'])
+def get_product(self, id):
+    """
+    Obtener un producto por su ID.
+    ---
+    tags:
+      - Productos
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: ID del producto a consultar
+        schema:
+          type: integer
+          format: int64
+          example: 1
+    responses:
+      200:
+        description: Producto encontrado correctamente
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  example: 1
+                nombre:
+                  type: string
+                  example: "Shampoo Herbal"
+                marca:
+                  type: string
+                  example: "Herbal Essences"
+                cantidad:
+                  type: integer
+                  example: 20
+                precio:
+                  type: number
+                  format: float
+                  example: 15900
+      404:
+        description: Producto no encontrado
+        content:
+          application/json:
+            schema:
+              type: object
+              example: {}
+      500:
+        description: Error interno del servidor
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: "Error al obtener producto"
+    """
+    try:
+        producto = ProductoModel.get_producto(id)
+        if producto is not None:
+            return jsonify(producto), 200
+        else:
+            return jsonify({}), 404
+    except Exception as ex:
+        return jsonify({'message': str(ex)}), 500
+
+   
+@main.route('/add', methods=['POST'])
+def add_product():
+    """
+    Agregar un nuevo producto
+    ---
+    tags:
+      - Productos
+    parameters:
+      - in: body
+        name: body
+        description: Datos del producto a agregar
+        required: true
+        schema:
+          type: object
+          required:
+            - nombre
+            - marca
+            - cantidad
+            - precio
+          properties:
+            nombre:
+              type: string
+              example: "Crema hidratante"
+            marca:
+              type: string
+              example: "Nivea"
+            cantidad:
+              type: integer
+              example: 10
+            precio:
+              type: number
+              format: float
+              example: 25900
+    responses:
+      201:
+        description: Producto agregado correctamente
+      500:
+        description: Error interno del servidor
+    """
+    try:
+        nombre = request.json['nombre']
+        marca = request.json['marca']
+        cantidad = request.json['cantidad']
+        precio = request.json['precio']
+
+        producto = Producto(None, nombre, marca, cantidad, precio)
+        ProductoModel.add_producto(producto)
+        return jsonify({'message': 'Producto agregado correctamente'}), 201
+    except Exception as ex:
+        return jsonify({'message': str(ex)}), 500
+
+   
+@main.route('/delete/<int:id>', methods=['DELETE'])
+def delete_product(id):
+    """
+    Eliminar un producto por su ID
+    ---
+    tags:
+      - Productos
+    parameters:
+      - name: id
+        in: path
+        type: integer
+        required: true
+        description: ID del producto a eliminar
+    responses:
+      200:
+        description: Producto eliminado correctamente
+        examples:
+          application/json: {"message": "Producto eliminado correctamente"}
+      404:
+        description: Producto no encontrado
+        examples:
+          application/json: {"message": "Ningún producto eliminado"}
+      500:
+        description: Error interno del servidor
+        examples:
+          application/json: {"message": "Error al eliminar el producto"}
+    """
+    try:
+        affected_rows = ProductoModel.delete_producto(id)
+        if affected_rows > 0:
+            return jsonify({'message': 'Producto eliminado correctamente'}), 200
+        else:
+            return jsonify({'message': 'Ningún producto eliminado'}), 404
+    except Exception as ex:
+        return jsonify({'message': str(ex)}), 500
+
+
+@main.route('/update/<id>', methods=['PUT'])
+def update_product(id):
+    """
+    Actualizar un producto (permite actualizar solo algunos campos)
+    ---
+    tags:
+      - Productos
+    parameters:
+      - name: id
+        in: path
+        type: integer
+        required: true
+        description: ID del producto que se desea actualizar
+      - in: body
+        name: body
+        description: Campos del producto a actualizar (puede enviar uno o varios)
+        required: true
+        schema:
+          type: object
+          properties:
+            nombre:
+              type: string
+              example: "Crema hidratante"
+            marca:
+              type: string
+              example: "Nivea"
+            cantidad:
+              type: integer
+              example: 5
+            precio:
+              type: number
+              format: float
+              example: 25900
+    responses:
+      200:
+        description: Producto actualizado correctamente
+        examples:
+          application/json: {"message": "Producto actualizado correctamente"}
+      404:
+        description: Ningún producto actualizado (ID no encontrado)
+        examples:
+          application/json: {"message": "Ningun producto actualizado"}
+      500:
+        description: Error interno del servidor
+        examples:
+          application/json: {"message": "Error al actualizar el producto"}
+    """
+    try:
+        data = request.json  # datos recibidos del body
+        producto = ProductoModel.get_producto(id)
+
+        if producto is None:
+            return jsonify({'message': 'Producto no encontrado'}), 404
+
+        # Actualiza solo los campos enviados en el JSON
+        nombre = data.get('nombre', producto['nombre'])
+        marca = data.get('marca', producto['marca'])
+        cantidad = data.get('cantidad', producto['cantidad'])
+        precio = data.get('precio', producto['precio'])
+
+        producto_actualizado = Producto(id, nombre, marca, cantidad, precio)
+        affected_rows = ProductoModel.update_producto(producto_actualizado)
+
+        if affected_rows == 1:
+            return jsonify({'message': 'Producto actualizado correctamente'}), 200
+        else:
+            return jsonify({'message': 'Ningun producto actualizado'}), 404
+
+    except Exception as ex:
+        return jsonify({'message': str(ex)}), 500
