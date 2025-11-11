@@ -287,3 +287,6 @@ def update_product(id):
 
     except Exception as ex:
         return jsonify({'message': str(ex)}), 500
+
+
+
