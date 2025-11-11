@@ -1,12 +1,12 @@
 from flask import Flask 
 from flasgger import Swagger
-
+from flask_cors import CORS
 from routes import Product
 from config import config
 
 app = Flask(__name__)
 swagger = Swagger(app)  # inicializamos Swagger
-
+CORS(app)
 def page_not_found(e):
     return "La página que buscas no existe", 404
 
