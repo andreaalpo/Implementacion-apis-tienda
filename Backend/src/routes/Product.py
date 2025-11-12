@@ -61,7 +61,7 @@ def get_products():
         return jsonify({'message': str(ex)}), 500
 
 @main.route('/<id>', methods=['GET'])
-def get_product(self, id):
+def get_product(id):
     """
     Obtener un producto por su ID.
     ---
