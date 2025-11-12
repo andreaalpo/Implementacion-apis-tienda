@@ -42,6 +42,9 @@ def get_products():
                     type: number
                     format: float
                     example: 15900
+                  categoria:
+                    type: string
+                    example: "Cuidado Personal"
       500:
         description: Error interno del servidor
         content:
@@ -100,6 +103,9 @@ def get_product(id):
                   type: number
                   format: float
                   example: 15900
+                categoria:
+                  type: string
+                  example: "Cuidado Personal"
       404:
         description: Producto no encontrado
         content:
@@ -161,6 +167,9 @@ def add_product():
               type: number
               format: float
               example: 25900
+            categoria_id:
+              type: integer
+              example: 2
     responses:
       201:
         description: Producto agregado correctamente
@@ -172,8 +181,9 @@ def add_product():
         marca = request.json['marca']
         cantidad = request.json['cantidad']
         precio = request.json['precio']
+        categoria_id = request.json('categoria_id')  # campo opcional
 
-        producto = Producto(None, nombre, marca, cantidad, precio)
+        producto = Producto(None, nombre, marca, cantidad, precio, categoria_id)
         ProductoModel.add_producto(producto)
         return jsonify({'message': 'Producto agregado correctamente'}), 201
     except Exception as ex:
@@ -250,6 +260,9 @@ def update_product(id):
               type: number
               format: float
               example: 25900
+            categoria_id:
+              type: integer
+              example: 2
     responses:
       200:
         description: Producto actualizado correctamente
@@ -276,8 +289,9 @@ def update_product(id):
         marca = data.get('marca', producto['marca'])
         cantidad = data.get('cantidad', producto['cantidad'])
         precio = data.get('precio', producto['precio'])
+        categoria_id = data.get('categoria_id', producto['categoria_id'])
 
-        producto_actualizado = Producto(id, nombre, marca, cantidad, precio)
+        producto_actualizado = Producto(id, nombre, marca, cantidad, precio, categoria_id)
         affected_rows = ProductoModel.update_producto(producto_actualizado)
 
         if affected_rows == 1:
