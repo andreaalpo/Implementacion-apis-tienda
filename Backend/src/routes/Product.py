@@ -181,7 +181,7 @@ def add_product():
         marca = request.json['marca']
         cantidad = request.json['cantidad']
         precio = request.json['precio']
-        categoria_id = request.json('categoria_id')  # campo opcional
+        categoria_id = request.json['categoria_id'] 
 
         producto = Producto(None, nombre, marca, cantidad, precio, categoria_id)
         ProductoModel.add_producto(producto)
