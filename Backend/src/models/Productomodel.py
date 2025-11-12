@@ -98,7 +98,7 @@ class ProductoModel():
                     UPDATE productos 
                     SET nombre = %s, marca = %s, cantidad = %s, precio = %s, categoria_id = %s
                     WHERE id = %s
-                """, (product.nombre, product.marca, product.cantidad, product.precio, product.id, product.categoria_id))
+                """, (product.nombre, product.marca, product.cantidad, product.precio, product.categoria_id, product.id, ))
                 affected_rows = cursor.rowcount
                 connection.commit()
                 

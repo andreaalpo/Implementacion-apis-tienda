@@ -2,6 +2,7 @@ from flask import Flask
 from flasgger import Swagger
 from flask_cors import CORS
 from routes import Product
+from routes import Categoria
 from config import config
 
 app = Flask(__name__)
@@ -21,6 +22,7 @@ def home():
 
 # Blueprints
 app.register_blueprint(Product.main, url_prefix='/api/productos')
+app.register_blueprint(Categoria.main, url_prefix='/api/categorias')
 
 # Configuración Swagger
 app.config['SWAGGER'] = {
