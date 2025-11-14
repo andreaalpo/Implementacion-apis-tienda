@@ -1,6 +1,7 @@
 from database.db import get_db_connection
 from .entities.Producto import Producto
 
+
 class ProductoModel():
     @classmethod
     def get_productos(self):

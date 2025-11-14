@@ -4,6 +4,7 @@ from models.Categoriamodel import CategoriaModel
 
 #entities
 from models.entities.Categoria import Categoria
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 
 main = Blueprint('category_blueprint', __name__)
@@ -111,13 +112,22 @@ def get_category(id):
 
    
 @main.route('/add', methods=['POST'])
+@jwt_required()
 def add_category():
     """
     Agregar una nueva categoria
     ---
     tags:
       - Categorias
+    security:
+      - BearerAuth: []
+
     parameters:
+      - in: header
+        name: Authorization
+        required: true
+        type: string
+        description: "Token JWT. Formato: Bearer {token}"
       - in: body
         name: body
         description: Nombre de la categoria a agregar
@@ -149,13 +159,22 @@ def add_category():
 
    
 @main.route('/delete/<int:id>', methods=['DELETE'])
+@jwt_required()
 def delete_category(id):
     """
     Eliminar una categoria por su ID
     ---
     tags:
       - Categorias
+    security:
+      - BearerAuth: []
+
     parameters:
+      - in: header
+        name: Authorization
+        required: true
+        type: string
+        description: "Token JWT. Formato: Bearer {token}"
       - name: id
         in: path
         type: integer
@@ -186,13 +205,22 @@ def delete_category(id):
 
 
 @main.route('/update/<id>', methods=['PUT'])
+@jwt_required()
 def update_category(id):
     """
     Actualizar una categoria 
     ---
     tags:
       - Categorias
+    security:
+      - BearerAuth: []
+
     parameters:
+      - in: header
+        name: Authorization
+        required: true
+        type: string
+        description: "Token JWT. Formato: Bearer {token}"
       - name: id
         in: path
         type: integer

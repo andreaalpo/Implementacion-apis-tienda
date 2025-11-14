@@ -4,6 +4,8 @@ from models.Productomodel import ProductoModel
 
 #entities
 from models.entities.Producto import Producto
+from flask_jwt_extended import jwt_required, get_jwt_identity
+
 
 
 main = Blueprint('product_blueprint', __name__)
@@ -135,13 +137,23 @@ def get_product(id):
 
    
 @main.route('/add', methods=['POST'])
+@jwt_required()
 def add_product():
     """
     Agregar un nuevo producto
     ---
     tags:
       - Productos
+    security:
+      - BearerAuth: []
+
     parameters:
+      - in: header
+        name: Authorization
+        required: true
+        type: string
+        description: "Token JWT. Formato: Bearer {token}"
+
       - in: body
         name: body
         description: Datos del producto a agregar
@@ -177,6 +189,8 @@ def add_product():
         description: Error interno del servidor
     """
     try:
+        current_user_id = get_jwt_identity()
+
         nombre = request.json['nombre']
         marca = request.json['marca']
         cantidad = request.json['cantidad']
@@ -185,19 +199,29 @@ def add_product():
 
         producto = Producto(None, nombre, marca, cantidad, precio, categoria_id)
         ProductoModel.add_producto(producto)
-        return jsonify({'message': 'Producto agregado correctamente'}), 201
+        return jsonify({'message': 'Producto agregado correctamente', 'usuario: ' : current_user_id}), 201
     except Exception as ex:
         return jsonify({'message': str(ex)}), 500
 
    
 @main.route('/delete/<int:id>', methods=['DELETE'])
+@jwt_required()
 def delete_product(id):
     """
     Eliminar un producto por su ID
     ---
     tags:
       - Productos
+    security:
+      - BearerAuth: []
+
     parameters:
+      - in: header
+        name: Authorization
+        required: true
+        type: string
+        description: "Token JWT. Formato: Bearer {token}"
+
       - name: id
         in: path
         type: integer
@@ -228,13 +252,23 @@ def delete_product(id):
 
 
 @main.route('/update/<id>', methods=['PUT'])
+@jwt_required()
 def update_product(id):
     """
     Actualizar un producto (permite actualizar solo algunos campos)
     ---
     tags:
       - Productos
+    security:
+      - BearerAuth: []
+
     parameters:
+      - in: header
+        name: Authorization
+        required: true
+        type: string
+        description: "Token JWT. Formato: Bearer {token}"
+
       - name: id
         in: path
         type: integer
