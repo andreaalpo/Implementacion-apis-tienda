@@ -6,8 +6,8 @@ class Producto():
         self.marca = marca
         self.cantidad = cantidad
         self.precio = precio
-        self.categoria_id = categoria_id            # ID de la categoría a la que pertenece el producto
-        self.categoria_nombre = categoria_nombre    # Nombre descriptivo (opcional, útil en joins)
+        self.categoria_id = categoria_id            
+        self.categoria_nombre = categoria_nombre    
 
 
     def to_JSON(self):

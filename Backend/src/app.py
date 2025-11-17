@@ -12,7 +12,6 @@ from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
 CORS(app)
-# swagger = Swagger(app)  # inicializamos Swagger
 
 
 def page_not_found(e):
@@ -56,11 +55,9 @@ swagger = Swagger(app, template=swagger_template)
 
 
 # carga variables del .env
-load_dotenv()  # busca el .env en la raíz del proyecto
+load_dotenv() 
 
-# Configuración JWT usando variables de entorno
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "dev-secret-change-me")
-# puedes configurar expiración por horas o segundos; aquí lo hacemos en segundos por compatibilidad
 expires_seconds = int(os.getenv("JWT_ACCESS_TOKEN_EXPIRES", "3600"))
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(seconds=expires_seconds)
 
@@ -75,28 +72,10 @@ def add_bearer_prefix():
         request.headers.environ["HTTP_AUTHORIZATION"] = "Bearer " + auth
 
 
-@app.route('/test-token', methods=['POST'])
-def make_test_token():
-    data = request.get_json() or {}
-    identity = data.get('id', 1)
-    token = create_access_token(identity=str(identity))   # <-- AQUÍ EL CAMBIO
-    return {'access_token': token}, 200
-
-
-@app.route('/test-protected', methods=['GET'])
-@jwt_required()
-def test_protected():
-    current = get_jwt_identity()
-    return {'msg': 'token valido', 'identity': current}, 200
-
-
 if __name__ == '__main__':
 
     app.config.from_object(config['development'])
     
-
-    # #blueprints
-    # app.register_blueprint(Product.main, url_prefix='/api/productos')
 
     #manejador de error
     app.register_error_handler(404, page_not_found)
