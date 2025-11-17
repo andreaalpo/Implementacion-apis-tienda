@@ -56,97 +56,135 @@ class ProductoModel():
             raise ex
         
     
-    @classmethod
-    def productos_por_categoria(self, categoria_id):
-        try:
-            connection = get_db_connection()
-            productos = []
+    # @classmethod
+    # def productos_por_categoria(self, categoria_id):
+    #     try:
+    #         connection = get_db_connection()
+    #         productos = []
 
-            query = """
-                SELECT 
-                    p.id, 
-                    p.nombre, 
-                    p.marca, 
-                    p.cantidad, 
-                    p.precio, 
-                    p.categoria_id,
-                    c.nombre AS categoria_nombre
-                FROM productos p
-                LEFT JOIN categorias c 
-                    ON p.categoria_id = c.id
-                WHERE p.categoria_id = %s
-                ORDER BY p.nombre;
-            """
+    #         query = """
+    #             SELECT 
+    #                 p.id, 
+    #                 p.nombre, 
+    #                 p.marca, 
+    #                 p.cantidad, 
+    #                 p.precio, 
+    #                 p.categoria_id,
+    #                 c.nombre AS categoria_nombre
+    #             FROM productos p
+    #             LEFT JOIN categorias c 
+    #                 ON p.categoria_id = c.id
+    #             WHERE p.categoria_id = %s
+    #             ORDER BY p.nombre;
+    #         """
 
-            with connection.cursor() as cursor:
-                cursor.execute(query, (categoria_id,))
-                rows = cursor.fetchall()
+    #         with connection.cursor() as cursor:
+    #             cursor.execute(query, (categoria_id,))
+    #             rows = cursor.fetchall()
 
-            for row in rows:
-                producto = Producto(
-                    row[0],  
-                    row[1],  
-                    row[2],  
-                    row[3],  
-                    row[4],  
-                    row[5],  
-                    row[6]   
-                )
-                productos.append(producto.to_JSON())
+    #         for row in rows:
+    #             producto = Producto(
+    #                 row[0],  
+    #                 row[1],  
+    #                 row[2],  
+    #                 row[3],  
+    #                 row[4],  
+    #                 row[5],  
+    #                 row[6]   
+    #             )
+    #             productos.append(producto.to_JSON())
 
-            connection.close()
-            return productos
+    #         connection.close()
+    #         return productos
 
-        except Exception as ex:
-            raise ex
+    #     except Exception as ex:
+    #         raise ex
         
 
+    # @classmethod
+    # def buscar_por_nombre(self, texto):
+    #     try:
+    #         connection = get_db_connection()
+    #         productos = []
+
+    #         query = """
+    #             SELECT 
+    #                 p.id,
+    #                 p.nombre,
+    #                 p.marca,
+    #                 p.cantidad,
+    #                 p.precio,
+    #                 p.categoria_id,
+    #                 c.nombre AS categoria_nombre
+    #             FROM productos p
+    #             LEFT JOIN categorias c 
+    #                 ON p.categoria_id = c.id
+    #             WHERE LOWER(p.nombre) LIKE LOWER(%s)
+    #             ORDER BY p.nombre;
+    #         """
+
+    #         pattern = f"%{texto}%"   
+
+    #         with connection.cursor() as cursor:
+    #             cursor.execute(query, (pattern,))
+    #             rows = cursor.fetchall()
+
+    #         for row in rows:
+    #             producto = Producto(
+    #                 row[0],  
+    #                 row[1],  
+    #                 row[2],  
+    #                 row[3],  
+    #                 row[4],  
+    #                 row[5],  
+    #                 row[6]   
+    #             )
+    #             productos.append(producto.to_JSON())
+
+    #         connection.close()
+    #         return productos
+
+    #     except Exception as ex:
+    #         raise ex
     @classmethod
-    def buscar_por_nombre(self, texto):
+    def buscar(self, nombre=None, categoria_id=None):
         try:
             connection = get_db_connection()
             productos = []
 
             query = """
-                SELECT 
-                    p.id,
-                    p.nombre,
-                    p.marca,
-                    p.cantidad,
-                    p.precio,
-                    p.categoria_id,
-                    c.nombre AS categoria_nombre
+                SELECT p.id, p.nombre, p.marca, p.cantidad, p.precio,
+                    p.categoria_id, c.nombre AS categoria_nombre
                 FROM productos p
-                LEFT JOIN categorias c 
-                    ON p.categoria_id = c.id
-                WHERE LOWER(p.nombre) LIKE LOWER(%s)
-                ORDER BY p.nombre;
+                LEFT JOIN categorias c ON p.categoria_id = c.id
+                WHERE 1=1
             """
+            params = []
 
-            pattern = f"%{texto}%"   
+            if nombre:
+                query += " AND p.nombre ILIKE %s"
+                params.append(f"%{nombre}%")
+
+            if categoria_id:
+                query += " AND p.categoria_id = %s"
+                params.append(categoria_id)
 
             with connection.cursor() as cursor:
-                cursor.execute(query, (pattern,))
+                cursor.execute(query, tuple(params))
                 rows = cursor.fetchall()
 
-            for row in rows:
-                producto = Producto(
-                    row[0],  
-                    row[1],  
-                    row[2],  
-                    row[3],  
-                    row[4],  
-                    row[5],  
-                    row[6]   
-                )
-                productos.append(producto.to_JSON())
+                for row in rows:
+                    producto = Producto(
+                        row[0], row[1], row[2], row[3], row[4],
+                        row[5], row[6]
+                    )
+                    productos.append(producto.to_JSON())
 
             connection.close()
             return productos
 
         except Exception as ex:
             raise ex
-
 
 
 
