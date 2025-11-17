@@ -368,6 +368,39 @@ def productos_por_categoria(categoria_id):
 
     except Exception as ex:
         return jsonify({'message': str(ex)}), 500
+    
+
+@main.route('/buscar', methods=['GET'])
+def buscar_producto():
+    """
+    Buscar productos por nombre (coincidencia parcial)
+    ---
+    tags:
+      - Filtrar por nombre de producto
+    parameters:
+      - name: nombre
+        in: query
+        required: true
+        description: Texto a buscar en el nombre del producto
+        schema:
+          type: string
+          example: "shampoo"
+    responses:
+      200:
+        description: Lista de productos encontrados
+    """
+    try:
+        nombre = request.args.get('nombre', '')
+
+        if not nombre.strip():
+            return jsonify({'message': 'Debe enviar un texto para buscar'}), 400
+
+        productos = ProductoModel.buscar_por_nombre(nombre)
+        return jsonify(productos), 200
+
+    except Exception as ex:
+        return jsonify({'message': str(ex)}), 500
+
 
 
 

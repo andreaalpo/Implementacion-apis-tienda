@@ -84,13 +84,13 @@ class ProductoModel():
 
             for row in rows:
                 producto = Producto(
-                    row[0],  # id
-                    row[1],  # nombre
-                    row[2],  # marca
-                    row[3],  # cantidad
-                    row[4],  # precio
-                    row[5],  # categoria_id
-                    row[6]   # categoria_nombre
+                    row[0],  
+                    row[1],  
+                    row[2],  
+                    row[3],  
+                    row[4],  
+                    row[5],  
+                    row[6]   
                 )
                 productos.append(producto.to_JSON())
 
@@ -99,6 +99,55 @@ class ProductoModel():
 
         except Exception as ex:
             raise ex
+        
+
+    @classmethod
+    def buscar_por_nombre(self, texto):
+        try:
+            connection = get_db_connection()
+            productos = []
+
+            query = """
+                SELECT 
+                    p.id,
+                    p.nombre,
+                    p.marca,
+                    p.cantidad,
+                    p.precio,
+                    p.categoria_id,
+                    c.nombre AS categoria_nombre
+                FROM productos p
+                LEFT JOIN categorias c 
+                    ON p.categoria_id = c.id
+                WHERE LOWER(p.nombre) LIKE LOWER(%s)
+                ORDER BY p.nombre;
+            """
+
+            pattern = f"%{texto}%"   
+
+            with connection.cursor() as cursor:
+                cursor.execute(query, (pattern,))
+                rows = cursor.fetchall()
+
+            for row in rows:
+                producto = Producto(
+                    row[0],  
+                    row[1],  
+                    row[2],  
+                    row[3],  
+                    row[4],  
+                    row[5],  
+                    row[6]   
+                )
+                productos.append(producto.to_JSON())
+
+            connection.close()
+            return productos
+
+        except Exception as ex:
+            raise ex
+
+
 
 
         
