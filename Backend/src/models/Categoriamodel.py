@@ -57,6 +57,24 @@ class CategoriaModel():
             raise ex
         
     @classmethod
+    def tiene_productos(self, categoria_id):
+        try:
+            connection = get_db_connection()
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    SELECT COUNT(*) 
+                    FROM productos 
+                    WHERE categoria_id = %s;
+                """, (categoria_id,))
+                count = cursor.fetchone()[0]
+
+            connection.close()
+            return count > 0  # True si tiene productos
+        except Exception as ex:
+            raise ex
+
+        
+    @classmethod
     def delete_categoria(self,id):
         try:
             connection = get_db_connection()

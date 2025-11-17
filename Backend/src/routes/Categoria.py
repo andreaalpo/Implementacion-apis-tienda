@@ -195,6 +195,10 @@ def delete_category(id):
           application/json: {"message": "Error al eliminar la categoria"}
     """
     try:
+        # Verificar si la categoria tiene productos asociados
+        if CategoriaModel.tiene_productos(id):
+            return jsonify({'message': 'No se puede eliminar la categoria porque tiene productos asociados'}), 400
+        
         affected_rows = CategoriaModel.delete_categoria(id)
         if affected_rows > 0:
             return jsonify({'message': 'Categoria eliminada correctamente'}), 200
