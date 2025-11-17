@@ -41,6 +41,9 @@ class CategoriaModel():
         except Exception as ex:
             raise ex
         
+
+
+        
     @classmethod
     def add_categoria(self,categoria):
         try:

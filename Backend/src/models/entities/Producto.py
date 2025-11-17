@@ -18,6 +18,6 @@ class Producto():
             'cantidad': self.cantidad,
             'precio': self.precio,
             'categoria_id': self.categoria_id,
-            'categoria': self.categoria_nombre  
+            'categoria_nombre': self.categoria_nombre  
         }
   

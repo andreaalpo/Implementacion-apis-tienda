@@ -335,6 +335,40 @@ def update_product(id):
 
     except Exception as ex:
         return jsonify({'message': str(ex)}), 500
+    
+
+
+@main.route('/por-categoria/<int:categoria_id>', methods=['GET'])
+def productos_por_categoria(categoria_id):
+    """
+    Obtener productos filtrados por categoría
+    ---
+    tags:
+      - Filtrar por categoria
+    parameters:
+      - name: categoria_id
+        in: path
+        required: true
+        description: ID de la categoría
+        schema:
+          type: integer
+    responses:
+      200:
+        description: Lista de productos filtrados
+      404:
+        description: No hay productos en esta categoría
+    """
+    try:
+        productos = ProductoModel.productos_por_categoria(categoria_id)
+
+        if not productos:
+            return jsonify({'message': 'No hay productos en esta categoría'}), 404
+        
+        return jsonify(productos), 200
+
+    except Exception as ex:
+        return jsonify({'message': str(ex)}), 500
+
 
 
 

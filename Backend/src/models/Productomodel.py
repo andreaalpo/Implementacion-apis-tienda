@@ -55,6 +55,53 @@ class ProductoModel():
         except Exception as ex:
             raise ex
         
+    
+    @classmethod
+    def productos_por_categoria(self, categoria_id):
+        try:
+            connection = get_db_connection()
+            productos = []
+
+            query = """
+                SELECT 
+                    p.id, 
+                    p.nombre, 
+                    p.marca, 
+                    p.cantidad, 
+                    p.precio, 
+                    p.categoria_id,
+                    c.nombre AS categoria_nombre
+                FROM productos p
+                LEFT JOIN categorias c 
+                    ON p.categoria_id = c.id
+                WHERE p.categoria_id = %s
+                ORDER BY p.nombre;
+            """
+
+            with connection.cursor() as cursor:
+                cursor.execute(query, (categoria_id,))
+                rows = cursor.fetchall()
+
+            for row in rows:
+                producto = Producto(
+                    row[0],  # id
+                    row[1],  # nombre
+                    row[2],  # marca
+                    row[3],  # cantidad
+                    row[4],  # precio
+                    row[5],  # categoria_id
+                    row[6]   # categoria_nombre
+                )
+                productos.append(producto.to_JSON())
+
+            connection.close()
+            return productos
+
+        except Exception as ex:
+            raise ex
+
+
+        
     @classmethod
     def add_producto(self,product):
         try:
